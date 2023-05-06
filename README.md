@@ -6,6 +6,7 @@ This Python script uses the OpenAI API to generate instruction-output pairs base
 
 * (optionally) - save the input text chunk used to generate the instruction-output pairs to the "input" in the JSON).
 * Output JSON files are to be used with [mindfeeder2](https://github.com/altenderfer/mindfeeder2) -> Providing further augmentation of the dataset that even creates new "input" / context with even more instructions and outputs based on the originals. 
+
 View mindfeeder2 here: [altenderfer/mindfeeder2](https://github.com/altenderfer/mindfeeder2)
 
 ## Prerequisites
