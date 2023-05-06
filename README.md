@@ -101,7 +101,7 @@ If you encounter any issues while running the script, make sure to check the fol
 
 - Ensure that you have a valid OpenAI API key and the openai package installed.
 - Double-check the input and output file paths to ensure they are correct.
-- Make sure the input text is formatted correctly with appropriate section breaks.
+- Make sure the input text is formatted correctly with appropriate section breaks. The script initally search for 3 line breaks, then 2 line breaks, then 1 to split/"chunk" the input ```txt``` when being sent to OpenAI.
 - Check the command line arguments to ensure they are set correctly.
 
 If the problem persists, you can add error handling or print statements to the script to help identify the issue.
