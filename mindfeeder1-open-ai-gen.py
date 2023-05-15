@@ -211,7 +211,7 @@ if __name__ == "__main__":
     parser.add_argument("--apikey", default="your_api_key")
     parser.add_argument("--model", default="gpt-3.5-turbo")
     parser.add_argument("--input", default="input.txt")
-    parser.add_argument("--max_words", default=300, type=int)
+    parser.add_argument("--max_words", default=3, type=int)
     parser.add_argument("--output", default="output.json")
     parser.add_argument("--num_instructions", default=12, type=int)
     parser.add_argument("--start_index", default=0, type=int)
