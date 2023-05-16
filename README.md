@@ -40,6 +40,7 @@ The script accepts the following command line arguments:
 
 ```
 --apikey: Your OpenAI API key (default: "your_api_key")
+--apibase: Used to change the default openai endpoint, defaults to openai
 --model: The OpenAI model to use (default: "gpt-3.5-turbo")
 --input: The input file containing the text (default: "input.txt")
 --max_words: The maximum number of words allowed in a text chunk (default: 300)
@@ -161,7 +162,17 @@ You can try adjusting the ```--prompt_input``` command line argument to provide 
 ```
 python mindfeeder1-open-ai-gen.py --apikey=your_api_key --input=input.txt --prompt_input "Be very detailed with your responses and use bullet points in necessary to organize the outputs."
 ```
+### What is --max_workers and its recommended settings?
 
+#### If you are using another endpoint besides openai... PLEASE RESPECT THE RULES OF THAT ENDPOINT - That means 2-3 workers max! Open AI settings below...
+
+Depending on how quickly / acuritly you want the output from this scrip to be. You will set accordinly. Higher settings yeild quicker results. Lower setting yield higher quality results.
+
+```--max_workers 10``` = Optimal Performance wirhout errors
+
+```--max_workers 20``` = Optimal Speed & Performance wirhout errors
+
+```--max_workers 30``` = Optimal Speed Performance with minimal errors
 
 
 
