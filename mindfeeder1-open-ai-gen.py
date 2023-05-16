@@ -16,13 +16,15 @@ def animate_connection():
             sys.stdout.flush()
             time.sleep(0.1)
 
-def connect_to_openai(api_key):
+def connect_to_openai(api_key, api_base):
     openai.api_key = api_key
+    openai.api_base = api_base
 
     t = threading.Thread(target=animate_connection, daemon=True)
     t.start()
 
     time.sleep(5)  # You can adjust the sleep time as needed
+
 
 def generate_new_iio_pairs(instruction, output, prompt_input, model, num_instructions, input_chunk, save_input=True):
     prompt = f"Use the format 'I:' for instructions (Can be a question or a command) and 'O:' for outputs. Separate each instruction and output with a newline, and do not number them. Provide only one instruction and output pair per set of instructions and outputs. Do not provide an instruction or output that is unknown, not available, not in context, unclear, not provided, not in the provided text, or something you cannot answer clearly when responding, instead search the internet. {prompt_input} Please generate {num_instructions} instructions and outputs based on the following text.\n\n{input_chunk}\n\n"
@@ -192,10 +194,11 @@ def process_input_data(sections, model, output_file, num_instructions, start_ind
     print(f"Processing completed. Results saved to {output_file}")
 
 
-def main(api_key, model, input_file, max_words, output_file, num_instructions, start_index, max_workers, prompt_input, filter_results, save_input):
-    connect_to_openai(api_key)
+def main(api_key, api_base, model, input_file, max_words, output_file, num_instructions, start_index, max_workers, prompt_input, filter_results, save_input):
+    connect_to_openai(api_key, api_base)
 
-    with open(input_file, 'r') as f:
+    # Specify the encoding as 'utf-8'
+    with open(input_file, 'r', encoding='utf-8') as f:
         raw_text = f.read()
 
     sections = split_text(raw_text, max_words, max_word_length=50)
@@ -206,12 +209,14 @@ def main(api_key, model, input_file, max_words, output_file, num_instructions, s
     process_input_data(sections, model, output_file, num_instructions, start_index, max_workers, prompt_input, filter_results, save_input)
 
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--apikey", default="your_api_key")
+    parser.add_argument("--apibase", default="https://api.openai.com/v1")  # Default API base for OpenAI
     parser.add_argument("--model", default="gpt-3.5-turbo")
     parser.add_argument("--input", default="input.txt")
-    parser.add_argument("--max_words", default=3, type=int)
+    parser.add_argument("--max_words", default=300, type=int)
     parser.add_argument("--output", default="output.json")
     parser.add_argument("--num_instructions", default=12, type=int)
     parser.add_argument("--start_index", default=0, type=int)
@@ -220,8 +225,5 @@ if __name__ == "__main__":
     parser.add_argument("--filter", default=True, type=lambda x: (str(x).lower() == 'true'))
     parser.add_argument("--save_input", default=True, type=lambda x: (str(x).lower() == 'true'))
 
-
     args = parser.parse_args()
-    main(args.apikey, args.model, args.input, args.max_words, args.output, args.num_instructions, args.start_index, args.max_workers, args.prompt_input, args.filter, args.save_input)
-
-
+    main(args.apikey, args.apibase, args.model, args.input, args.max_words, args.output, args.num_instructions, args.start_index, args.max_workers, args.prompt_input, args.filter, args.save_input)
