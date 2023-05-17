@@ -25,7 +25,6 @@ def connect_to_openai(api_key, api_base):
 
     time.sleep(5)  # You can adjust the sleep time as needed
 
-
 def generate_new_iio_pairs(instruction, output, prompt_input, model, num_instructions, input_chunk, save_input=True):
     prompt = f"Use the format 'I:' for instructions (Can be a question or a command) and 'O:' for outputs. Separate each instruction and output with a newline, and do not number them. Provide only one instruction and output pair per set of instructions and outputs. Do not provide an instruction or output that is unknown, not available, not in context, unclear, not provided, not in the provided text, or something you cannot answer clearly when responding, instead search the internet. {prompt_input} Please generate {num_instructions} instructions and outputs based on the following text.\n\n{input_chunk}\n\n"
 
@@ -49,7 +48,6 @@ def generate_new_iio_pairs(instruction, output, prompt_input, model, num_instruc
         ordered_pair = {"instruction": pair["instruction"], "input": input_chunk if save_input else "", "output": pair["output"]}
         io_pairs_with_input.append(ordered_pair)
     return io_pairs_with_input
-
 
 def split_text(text, max_words, max_word_length=50):
     max_chars = int(4096 * (max_words / 5))  # Estimate based on an average of 5 tokens per word
@@ -92,7 +90,6 @@ def split_text(text, max_words, max_word_length=50):
 
     return chunks
 
-
 def parse_io(content, filter_results=True):
     # Use regex to extract instruction and output pairs
     regex_pattern = r"I:((?:(?!I:|O:).)*)(?:\nO:((?:(?!I:|O:).)*)(?:\n\n|$))"
@@ -105,13 +102,33 @@ def parse_io(content, filter_results=True):
         "is not mentioned",
         "does not mention",
         "does not provide",
+        "doesn't provide",
+        "not provided",
+        "doesn't define",
+        "does not define",
         "does not indicate",
         "cannot provide",
         "is not stated",
         "is not provided",
+        "is not clear",
         "without further",
         "are not provided",
         "sorry,",
+        "the article did not",
+        "no information was provided",
+        "no specific answer",
+        "no output",
+        "there are no",
+        "no response given",
+        "no informatiuon",
+        "no more information",
+        "no further information",
+        "no notes",
+        "no mention",
+        "in the text",
+        "were not listed",
+        "is unknown",
+        "in the given text",
     ]
 
     for match in matches:
@@ -129,8 +146,7 @@ def parse_io(content, filter_results=True):
     return io_pairs
 
 # Magic
-def process_input_data(sections, model, output_file, num_instructions, start_index, max_workers=5, prompt_input="", filter_results=True, save_input=True):
-
+def process_input_data(sections, model, output_file, num_instructions, start_index, max_workers=5, timeout=300, prompt_input="", filter_results=True, save_input=True):
     def save_to_file(new_dataset):
         with open(output_file, 'w') as f:
             json.dump(new_dataset, f, indent=2, sort_keys=False)
@@ -157,13 +173,14 @@ def process_input_data(sections, model, output_file, num_instructions, start_ind
             for index, section in enumerate(sections[start_index:], start_index + 1)
         }
 
-
-
         for future in concurrent.futures.as_completed(future_to_index):
             index = future_to_index[future]
             try:
-                new_io_pairs = future.result()
+                new_io_pairs = future.result(timeout=timeout)
                 new_dataset.extend(new_io_pairs)
+            except concurrent.futures.TimeoutError:
+                print(f"\nError: Timeout for item {index} after {timeout} seconds.")
+                continue
             except Exception as e:
                 print(f"\nError processing item {index}: {e}")
                 traceback.print_exc()
@@ -193,7 +210,6 @@ def process_input_data(sections, model, output_file, num_instructions, start_ind
     save_to_file(new_dataset)
     print(f"Processing completed. Results saved to {output_file}")
 
-
 def main(api_key, api_base, model, input_file, max_words, output_file, num_instructions, start_index, max_workers, prompt_input, filter_results, save_input):
     connect_to_openai(api_key, api_base)
 
@@ -207,7 +223,6 @@ def main(api_key, api_base, model, input_file, max_words, output_file, num_instr
         print(f"\n\n\n{section}")
 
     process_input_data(sections, model, output_file, num_instructions, start_index, max_workers, prompt_input, filter_results, save_input)
-
 
 
 if __name__ == "__main__":
