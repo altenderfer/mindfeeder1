@@ -112,6 +112,7 @@ def parse_io(content, filter_results=True):
         "is not stated",
         "is not provided",
         "is not clear",
+        "is not defined",
         "without further",
         "are not provided",
         "sorry,",
