@@ -100,6 +100,7 @@ def parse_io(content, filter_results=True):
         "the text",
         "is not specified",
         "is not mentioned",
+        "is unclear",
         "does not mention",
         "does not provide",
         "doesn't provide",
